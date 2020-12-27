@@ -1,0 +1,8 @@
+# Deep Learning: Système d'investissement intelligent via apprentissage par Renforcement (TensorFlow/Keras)
+Conception d'un système intelligent sur Python TensorFlow qui analyse les données financières de l'entreprise Marocaine "Maroc Telecom" afin de prendre des décisions d'investissements autonomes.
+
+Le système est bâti sur une architecture "Double Deep Q-Neural Network" (DDQN) et, au fur et à mesure qu'il gagne de l'expérience, sa performance commence à s'améliorer plus il apprend en explorant son environnement. J'utilise une approche "Epsilon-Greedy" afin de garantir que l'agent intelligent continue à explorer de nouvelles décisions alternatives tout en exploitant sa connaissance d'ores et déjà apprise.
+
+Au début, l'Agent est crédité par une somme d'argent initiale envers laquelle il a l'entière liberté de décider soit de l'investir ou pas. S'il l'investit, il décide pour combien de temps doit-il maintenir sa position. Au début, ses décisions ont été aléatoires et sous-optimales, ce qui est attendu du fait qu'il ne fait que commencer à apprendre ce nouvel environnement. Or, à la fin de la boucle d'apprentissage (après avoir atteint un niveau maximal de récompenses cumulées), l'Agent intelligent a pu battre les benchmarks et KPIs pré-fixés en dépassant ainsi la performance du marché au fur et à mesure qu'il s'est familiarisé avec son environnement après avoir discerné la logique de la dynamique d'évolution des paramètres du marché donnant les attributs qui lui ont été conférés.
+
+Nonobstant sa réussite, le système peut néanmoins être amplement amélioré en introduisant des structures encore plus complexes que celles déjà utilisées.

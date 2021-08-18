@@ -1,8 +1,15 @@
-# Deep Learning: Système d'investissement intelligent via apprentissage par Renforcement (TensorFlow/Keras)
-Conception d'un système intelligent sur Python TensorFlow qui analyse les données financières de l'entreprise Marocaine "Maroc Telecom" afin de prendre des décisions d'investissements autonomes.
+# Double Deep Q-Learning: Intelligent investment Agent via Reinforcement Learning (TensorFlow)
 
-Le système est bâti sur une architecture "Double Deep Q-Neural Network" (DDQN) et, au fur et à mesure qu'il gagne de l'expérience, sa performance commence à s'améliorer plus il apprend en explorant son environnement. J'utilise une approche "Epsilon-Greedy" afin de garantir que l'agent intelligent continue à explorer de nouvelles décisions alternatives tout en exploitant sa connaissance d'ores et déjà apprise.
+## Goal:
+  •   Design of an intelligent system on Python's TensorFlow that analyzes the financial data of a company's stock price in order to make autonomous investment decisions. 
+   
+  •   At the start the Agent takes random decisions that gradually get better as the latter gets more and more familiar with its Environment.
 
-Au début, l'Agent est crédité par une somme d'argent initiale envers laquelle il a l'entière liberté de décider soit de l'investir ou pas. S'il l'investit, il décide pour combien de temps doit-il maintenir sa position. Au début, ses décisions ont été aléatoires et sous-optimales, ce qui est attendu du fait qu'il ne fait que commencer à apprendre ce nouvel environnement. Or, à la fin de la boucle d'apprentissage (après avoir atteint un niveau maximal de récompenses cumulées), l'Agent intelligent a pu battre les benchmarks et KPIs pré-fixés en dépassant ainsi la performance du marché au fur et à mesure qu'il s'est familiarisé avec son environnement après avoir discerné la logique de la dynamique d'évolution des paramètres du marché donnant les attributs qui lui ont été conférés.
+## Architecture:
+The system is built on a Double Deep Q-Neural Network (DDQN) architecture and, as it gains more experience, its performance starts gradually improving the more the Agent explores the Environment. An "Epsilon-Greedy" approach was used to ensure that the intelligent Agent continues to explore new alternative decisions while exploiting its already learned knowledge. "Epsilon annealing" was also used to encourage the Agent to exploit the gained knowledge more often than it explores new random variations.
 
-Nonobstant sa réussite, le système peut néanmoins être amplement amélioré en introduisant des structures encore plus complexes que celles déjà utilisées.
+## Experiment:
+At the beginning, the Agent is credited with an initial sum of money, which it has full freedom to decide whether to invest or not at each timestep. If the Agent invests the sum of money, the latter also decides for how long it should hold this position. At the beginning, the Agent's decisions were completely random and suboptimal, which is expected since it was merely the beginning of the process of learn this new Environment's dynamics. However, at the end of the learning loop (after reaching a threshold level of cumulative rewards), the Agent was able to beat the pre-set benchmarks and KPIs, thus outperforming the market as it became more familiar with its environment after discerning the logic of the dynamics of the evolution of the market parameters.
+
+## Note:
+Notwithstanding its success, the system can nevertheless be amply improved by introducing even more complex architectures (LSTMs, Transformers, Auto-encoders, etc.), by using more predictive input features, or simply by training it on a bigger dataset and tuning it on a distributed cluster.

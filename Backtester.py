@@ -90,7 +90,7 @@ order_size = starting_capital*percent_risked
 capital_curve = [starting_capital]
 
 # Closes the very last positon if left open:
-if bt_df[0][len(bt_df)-1] in ['Hold']:
+if bt_df[0][len(bt_df)-1] in ['Hold', 'Long', 'Short']:
     bt_df[0][len(bt_df)-1] = 'Close'
     
 
@@ -152,21 +152,26 @@ Validation
 # Making predictions on unseen data (i.e. validation set):
 last_action = 4   # cash
 pred_orders = []
+test_start = 0
 
-for i in range(9595, len(df)):
-    state = np.matrix(env.current_state(i))
+for i in range(test_start, len(df)):
+    state = np.matrix(env.current_state(i, df))
     pred = np.array(model(state))
     
     # reduce the set to available actions via set difference (complement) and
     #make it list so it is iterable:
-    for m in list({0,1,2,3,4} - set(env.action_space(last_action))): 
-        pred[0][m] = 0
+    for m in list( {0,1,2,3,4} - set(env.action_space(last_action)) ): 
+        pred[0][m] = None   # exclude unfeasible actions given last action
     
+    # Get action with maximum Q-value:
     for _ in range(5):
             if pred[0][_] == max(pred[0]):
                 pred_action = _
-                
+    
+    # Update prediced orders:
     pred_orders.append(pred_action)
+    
+    # Update last action for next iteration:
     last_action = pred_action
     
 for i in range(len(pred_orders)):
@@ -184,7 +189,56 @@ for i in range(len(pred_orders)):
         
     elif pred_orders[i] == 4:
         pred_orders[i] = "Cash"
+
+# Backtesting the validation predictions:
+validation_df = pd.concat([ohlc, lsch], axis=1)
+
+# Capital curve:
+starting_capital = 10_000
+percent_risked = 0.1
+order_size = starting_capital*percent_risked
+validation_capital_curve = [starting_capital]
+
+# Closes the very last positon if left open:
+if last_cell := validation_df[0][len(validation_df)-1] in ['Hold', 'Long', 
+                                                           'Short','nan']:
+    last_cell = 'Close'
+    
+
+# Backtester: calculate Profit/Loss based on entries and exits:
+for i in range(len(validation_df)):
+    if validation_df[0][i] == 'Long':
+        entry = validation_df['Close'][i]                   # Entry price
         
+        for o in range(i, len(validation_df)):
+            if validation_df[0][o] == 'Close':
+                _exit = validation_df['Close'][o]           # Store _exit price
+                p_l = (_exit - entry)*order_size    # profit/loss
+                starting_capital += p_l
+                validation_capital_curve.append(starting_capital)
+                break
+
+    elif validation_df[0][i] == 'Short':
+        entry = validation_df['Close'][i]                   # store entry price
+        
+        for o in range(i, len(validation_df)):              # Look for Close
+            if validation_df[0][o] == 'Close':
+                _exit = validation_df['Close'][o] 
+                p_l = (entry - _exit)*order_size    # Profit/Perte
+                starting_capital += p_l
+                validation_capital_curve.append(starting_capital)
+                break
+        
+# Visualize final Capital Curve:
+x = range(0,len(validation_capital_curve))
+fig, ax = plt.subplots()
+ax.plot(x, validation_capital_curve)
+ax.set_xlabel('Transactions')
+ax.set_ylabel('Capital')
+ax.set_title("Capital evolution after each transaction")
+plt.show()
+
+
 '''
 ###########################
 Random Strategy Monte Carlo
@@ -341,14 +395,17 @@ def Monte_Carlo(n : int) -> list:
     
     # Plot all simulated paths:
     plt.figure()
+    pd.DataFrame(capital_curve).plot()
     for i in range(len(curves.columns)):
         curves[f'{i}'].plot()
+    
     plt.title('Simulated paths of Random Strategy')
     plt.xlabel('Transactions')
     plt.ylabel('Equity')
     plt.show()
     
     print('Finished.')
+    
 
 # Statistics of the simulation:
 def simulation_stats():
@@ -364,4 +421,3 @@ def simulation_stats():
     
     print(f'- Expected Value of Random Strategy is: ${round(expected_value, 2)}')
     print(f'- Expected ROI of Random Strategy is: {round(expected_return, 2)}%')
-    

@@ -5,7 +5,7 @@ Utility functions to load data while avoiding CIRCULAR IMPORT anti-pattern.
 import pandas as pd
 
 # Function used to load the CSV data:
-def load_data(path):
+def load_data(path : str):
     try:
         global df
         df = pd.read_csv(path)

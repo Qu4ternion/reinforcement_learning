@@ -6,6 +6,7 @@
 Main function for the Algorithmic trading bot.
 """
 import keras
+import math
 import tensorflow             as tf
 import numpy                  as np
 import matplotlib.pyplot      as plt
@@ -96,28 +97,40 @@ def main():
             
             # epsilon-greedy: take an action given the state
             global epsilon
-            epsilon = max(epsilon, min_epsilon) # decay epsilon to the limit of 10%
+            # decay epsilon to the limit of 'min_epsilon'
+            epsilon = max(epsilon, min_epsilon) 
             
             if epsilon >= np.random.rand(1)[0]:
-                action = np.random.choice(env.action_space(last_action))  # pick a random action from action space depending on our last action taken
+                # pick a random action from action space depending on our last
+                # action taken.
+                action = np.random.choice(env.action_space(last_action))  
                 
             # else take Max Q-value action (best action):
             else:
+                # A tensor with the same data as input, with an additional
+                # dimension inserted at the index (position) specified by "axis"
                 state_tensor = tf.expand_dims(tf.convert_to_tensor(state), axis=0)
-                #state_tensor = tf.expand_dims(state_tensor, axis = 0) # A tensor with the same data as input, with an additional dimension inserted at the index (position) specified by "axis"
-                action_probs = model(state_tensor[0], training=False)  # input state into DQN to make a Q value prediction
+                #state_tensor = tf.expand_dims(state_tensor, axis = 0)
                 
+                # input state into DQN to make a Q value prediction
+                action_probs = model(state_tensor[0], training=False) 
+               
                 # Take best action (highest Q-value):
-                for i in env.action_space(last_action): # loop to find action that maximizes the estimated Q value
-                    reduced_space = [np.array(action_probs)[0][i] for i in env.action_space(last_action)]
-                # make an array that has only the available actions given last action
+                # loop to find action that maximizes the estimated Q value
+                for i in env.action_space(last_action):
+                    reduced_space =[np.array(action_probs)[0][i] \
+                                    for i in env.action_space(last_action)]
                 
-                # Since it's a reduced space, the indices of this list do not represent our original actions
-                # So we write these 2 loops to find the original index which gives us the max action
+                # Make an array that has only the available actions given last
+                # action
+                # Since it's a reduced space, the indices of this list do not
+                # represent our original actions
+                # So we write these 2 loops to find the original index which
+                # gives us the max action
                 for i in range(len(reduced_space)): 
                     if reduced_space[i] == max(reduced_space):
                         Max = reduced_space[i]
-                        
+                
                 for i in range(5):
                     if np.array(action_probs)[0][i] == Max:
                         action = i
@@ -158,7 +171,7 @@ def main():
             
             # Updating target Q-value: Q(s,a) = reward + gamma * max Q(s',a')
             target_q_value = action_reward + gamma * future_rewards
-           #target_q_value = action_reward + gamma * tf.reduce_max(future_rewards, axis=1)'''
+           #target_q_value = action_reward + gamma * tf.reduce_max(future_rewards, axis=1)
            
            # "tf.reduce_max" computes the maximum of elements across dimensions
            # of a tensor.
@@ -181,10 +194,11 @@ def main():
                 # Calculate loss between target Q-value and predicted Q-value
                 loss = loss_function(target_q_value, q_action)  
                 
-            # Uncomment to stop training if Loss diverges to infinity:
-            ''' if np.array(loss) == math.inf:
-                    print("Loss diverged on iteration:", state_index, "on epoch:", epoch)
-                    break'''
+            # Stop training if Loss diverges to infinity:
+            if np.array(loss) == math.inf:
+                    print('Loss diverged on iteration:', state_index,
+                          'on epoch:', epoch)
+                    break
             
             # Backpropagation:
             grads = tape.gradient(loss, model.trainable_variables)
@@ -231,16 +245,17 @@ def main():
             curr_equity.append(current_equity)
             
             # Show iteration, loss and exploration rate:
-            print("--------------------------------------")
-            print("- Epoch:", epoch)
-            print("- Iteration number:", state_index)
-            print("- Loss is equal to:", np.array(loss))
-            print("- Exploration probability is:", round(epsilon, 3))
-            print("- Cumulative reward is:", round(cum_reward[-1], 2))
+            print('--------------------------------------')
+            print(f'- Epoch: {epoch}')
+            print(f'- Iteration number: {state_index}')
+            print(f'- Loss is equal to: {np.array(loss)}')
+            print(f'- Exploration probability is: {round(epsilon, 3)}')
+            print(f'- Cumulative reward is: {round(cum_reward[-1], 2)}')
 
         x = range(0,len(cum_reward))
         fig, ax = plt.subplots()
         ax.plot(x, cum_reward)
+        plt.title(f'Cumulative rewards for Epoch: {epoch}')
         plt.show()
     
     # Mean of Errors:
@@ -250,6 +265,7 @@ def main():
     x = range(0,len(Losses))
     fig, ax = plt.subplots()
     ax.plot(x, Losses)
+    plt.title('Neural network Loss')
     plt.show()
     
     # Plot rewards overtime:
@@ -270,17 +286,19 @@ def main():
     plt.ylabel('Rewards')
     plt.show()
     
-    # Plot cumulative Buy Q Value:
-    q = []
-    for i in range(2,orders.count(0)):
-        q_ = cum_buy_q[i][0]
-        q.append(q_)
-    q = np.array(q)
-    
-    x = range(len(q))
-    fig, ax = plt.subplots()
-    ax.plot(x, q)
-    plt.show()
+# =============================================================================
+#     # Plot cumulative Buy Q Value:
+#     q = []
+#     for i in range(2,orders.count(0)):
+#         q_ = cum_buy_q[i][0]
+#         q.append(q_)
+#     q = np.array(q)
+#     
+#     x = range(len(q))
+#     fig, ax = plt.subplots()
+#     ax.plot(x, q)
+#     plt.show()
+# =============================================================================
 
 if __name__ == '__main__':
     main()

@@ -1,5 +1,9 @@
 # Double Deep Q-Learning: Intelligent investment Agent via Reinforcement Learning (TensorFlow)
 
+<p align="center">
+  <img width="460" height="300" src="https://github.com/Qu4ternion/reinforcement_learning/blob/master/img/monte_carlo.png">
+</p>
+
 ## Goal:
   •   Design of an intelligent system on Python's TensorFlow that analyzes the financial data of a company's stock price in order to make autonomous investment decisions. 
    

@@ -5,9 +5,8 @@
 
 Main function for the Algorithmic trading bot.
 """
-
-import tensorflow             as tf
 import keras
+import tensorflow             as tf
 import numpy                  as np
 import matplotlib.pyplot      as plt
 from   keras import backend   as K
@@ -20,9 +19,8 @@ from   metrics                import (nth_percentile, close_delta, VWAP,
                                       Bollinger, DoD)
 from   parameters             import (threshold, epsilon, min_epsilon, alpha,
                                       gamma, decay, data_path, _current_equity,
-                                      timesteps)
+                                      timesteps, epoch_limit)
 #tf.enable_eager_execution()
-
 
 def main():
 
@@ -30,6 +28,7 @@ def main():
     df = load_data(data_path)
     
     # Data cleaning:
+    print('Cleaning data...')
     try:
         missing = check_na(df)  # check for missing observations
         Assert(df)              # sanity check
@@ -41,6 +40,7 @@ def main():
         return df
     
     # Add input features:
+    print('Creating input features...')
     nth_percentile(df)          # n-th percentile price variation
     close_delta(df)             # day-to-day price difference
     VWAP(df)                    # Volume Waighted Average Price
@@ -51,9 +51,11 @@ def main():
     df = df.drop(['bb_ma', 'bb_high', 'bb_low','Date'], axis = 1)    
     
     # Instantiate "Environment" and feed it our dataframe:
+    global env
     env = Environment(df)
     
     # Instantiate Double Deep Q-Neural Networks (DQN + Target DQN):
+    global model
     model, target_dqn = DQN(), DQN()
     
     # Instantiate Loss function:
@@ -64,22 +66,13 @@ def main():
                  # keras.optimizers.Adam(learning_rate=0.00025, clipnorm=1.0)
     
     # Initialize storage for states, actions & rewards here:
-    #last_action = 4  # initial state: (i.e. cash)
-    #states_history = []
-    #actions_history = []
-    #rewards_history = []
-    #Losses = []
-    #orders = []
-    #overtime_rewards = []
     cumulative_reward = 0
-    #cum_reward = []
-    #cum_buy_q = []
     curr_equity = []
     epoch = 0
     K.clear_session()
     
     # Run loop until it's solved solved (as many epochs as necessary):
-    while cumulative_reward < threshold :
+    while cumulative_reward < threshold  and  epoch < epoch_limit:
         last_action = 4  # initial state: being in cash
         cumulative_reward = 0
         current_equity = _current_equity
@@ -163,7 +156,6 @@ def main():
             # Double DQN framework:
             future_rewards = target_dqn(tf.expand_dims(next_state, axis=0))
             
-            
             # Updating target Q-value: Q(s,a) = reward + gamma * max Q(s',a')
             target_q_value = action_reward + gamma * future_rewards
            #target_q_value = action_reward + gamma * tf.reduce_max(future_rewards, axis=1)'''
@@ -240,7 +232,7 @@ def main():
             
             # Show iteration, loss and exploration rate:
             print("--------------------------------------")
-            print("- epoch:", epoch)
+            print("- Epoch:", epoch)
             print("- Iteration number:", state_index)
             print("- Loss is equal to:", np.array(loss))
             print("- Exploration probability is:", round(epsilon, 3))

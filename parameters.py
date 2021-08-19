@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Parameters to change in order to try different settings.
+Settings & Hyper-parameters to change in order to try different configurations.
 """
 
 # Path to the used CSV data:
-data_path = r'C:\Users\Acer\Desktop\Data Projects\Python\Deep Q-Learning\
-            \project\data\stock_prices.csv'
+data_path = r'C:\Users\Acer\Desktop\Data Projects\Python\Deep Q-Learning\project\master\data\stock_prices.csv'
 
 # Equity the Agent starts with:
 starting_equity = 10000
@@ -31,6 +30,9 @@ alpha = 0.001
 
 # Reward threshold to stop training once reached:
 threshold = 100
+
+# Maximum epochs to run training before stopping (whether optimized or not)
+epoch_limit = 1
 
 # How many time-steps to update the Target DQN:
 timesteps = 10

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Utility function to load data while avoiding CIRCULAR IMPORT anti-pattern.
+Utility functions to load data while avoiding CIRCULAR IMPORT anti-pattern.
 """
 import pandas as pd
 
 # Function used to load the CSV data:
-def load_data(path) -> pd.dataframe:
+def load_data(path):
     try:
         global df
         df = pd.read_csv(path)
@@ -15,6 +15,6 @@ def load_data(path) -> pd.dataframe:
         df = pd.read_csv(input('Input path to data:'))
         return df
 
-# Function to export the cleaned and augmented data:
+# Function to export the cleaned and augmented data to Excel:
 def export_data(dataframe):
     dataframe.to_excel(r'C:/Users/Acer/Desktop/data.xlsx')
